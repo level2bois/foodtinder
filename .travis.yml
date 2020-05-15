@@ -4,6 +4,9 @@ dist: trusty
 git:
   depth: false
 
+env:
+  global:
+    - ANDROID_API_LEVEL = 29
 
 android:
   components:
@@ -26,7 +29,11 @@ android:
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
     - sys-img-x86-android-29
-    - sys-img-armeabi-v7a-android-29
+    - sys-img-armeabi-v7a-addon-google_apis-google-$ANDROID_API_LEVEL
+  licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 
 # Emulator Management: Create, Start and Wait
 before_script:
