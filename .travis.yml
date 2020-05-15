@@ -1,17 +1,27 @@
 language: android
 dist: trusty
+
+git:
+  depth: false
+
+env:
+  global:
+    - ANDROID_API_LEVEL = 29
+
 android:
   components:
     # Uncomment the lines below if you want to
     # use the latest revision of Android SDK Tools
-    # - tools
-    # - platform-tools
+    - tools
+    - platform-tools
 
     # The BuildTools version used by your project
     - build-tools-29.0.3
 
     # The SDK version used to compile your project
     - android-29
+    - add-on
+    - extra
 
     # Additional components
     - extra-google-google_play_services
@@ -20,5 +30,26 @@ android:
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
-    - sys-img-x86-android-29
-    - sys-img-armeabi-v7a-android-17
+    -
+  licenses:
+    - 'android-sdk-preview-license-.+'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
+
+before_install:
+  # Install SDK license so Android Gradle plugin can install deps.
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
+  # Install the system image.
+  - yes | sdkmanager "system-images;android-29;google_apis_playstore;armeabi-v7a"
+  # Create and start emulator for the script. Meant to race the install task.
+  - echo no | avdmanager create avd --force -n emulatorApi29 -k "system-images;android-29;google_apis_playstore;armeabi-v7a"
+  - $ANDROID_HOME/emulator/emulator -avd emulatorApi29 -no-audio -no-window &
+
+before_script:
+  - android-wait-for-emulator
+  # Disable animations
+  - adb shell settings put global window_animation_scale 0 &
+  - adb shell settings put global transition_animation_scale 0 &
+  - adb shell settings put global animator_duration_scale 0 &
+  - adb shell input keyevent 82 &
