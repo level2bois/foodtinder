@@ -36,6 +36,7 @@ android:
 
 # Emulator Management: Create, Start and Wait
 before_script:
+  - android list targets
   - echo no | android create avd --force -n test -t android-26 --abi x86
   #- echo no | avdmanager create avd --name "MyEmulator" -k "system-images;android-29;google_apis;x86"
   - emulator -avd test -no-audio -no-window &
